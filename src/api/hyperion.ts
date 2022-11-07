@@ -20,7 +20,11 @@ export class HyperionApi {
 
   async getDirectMessages(payload: GetMessagesPayload): Promise<any> {
     return await this.fetch(
-      `${this.hyperion_url}/v2/history/get_actions?limit=${payload.limit}&skip=${payload.skip}&account=${payload.account}&track=${payload.track}&filter=${this.contract}:senddm&sort=${payload.sort}&after=${payload.after}&before=${payload.before}&simple=${payload.simple}&hot_only=${payload.hot_only}&noBinary=${payload.noBinary}&checkLib=${payload.checkLib}`,
+      `${this.hyperion_url}/v2/history/get_actions?${this.queryParser(
+        payload,
+        this.contract,
+        "senddm"
+      )}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -30,7 +34,11 @@ export class HyperionApi {
 
   async getChannelMessages(payload: GetMessagesPayload): Promise<any> {
     return await this.fetch(
-      `${this.hyperion_url}/v2/history/get_actions?limit=${payload.limit}&skip=${payload.skip}&account=${payload.account}&track=${payload.track}&filter=${this.contract}:sendchlmsg&sort=${payload.sort}&after=${payload.after}&before=${payload.before}&simple=${payload.simple}&hot_only=${payload.hot_only}&noBinary=${payload.noBinary}&checkLib=${payload.checkLib}`,
+      `${this.hyperion_url}/v2/history/get_actions?${this.queryParser(
+        payload,
+        this.contract,
+        "sendchlmsg"
+      )}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -40,11 +48,26 @@ export class HyperionApi {
 
   async getChatMessages(payload: GetMessagesPayload): Promise<any> {
     return await this.fetch(
-      `${this.hyperion_url}/v2/history/get_actions?limit=${payload.limit}&skip=${payload.skip}&account=${payload.account}&track=${payload.track}&filter=${this.contract}:sendchtmsg&sort=${payload.sort}&after=${payload.after}&before=${payload.before}&simple=${payload.simple}&hot_only=${payload.hot_only}&noBinary=${payload.noBinary}&checkLib=${payload.checkLib}`,
+      `${this.hyperion_url}/v2/history/get_actions?${this.queryParser(
+        payload,
+        this.contract,
+        "sendchtmsg"
+      )}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }
     );
+  }
+  queryParser(payload: GetMessagesPayload, contract: string, method: string) {
+    const propParser = (name: string, payload: any) =>
+      payload !== undefined ? `${name}=${payload}&` : "";
+
+    let query = Object.entries(payload).reduce((acc, element) => {
+      return acc + propParser(element[0], element[1]);
+    }, "");
+    query = `filter=${contract}:${method}&` + query;
+
+    return query;
   }
 }
